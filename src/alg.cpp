@@ -1,101 +1,79 @@
 // Copyright 2021 NNTU-CS
-int countPairs1(int *arr, int len, int value) {
+#include <iostream>
+#include <cstdint>
+#include <alg.h>
+
+int countPairs1(int *arr, int len, int val) {
   int cnt = 0;
-  for (int i = 0; i < (len - 1); i++) {
-    for (int j = i + 1; j < len; j++) {
-      if ((arr[i] + arr[j]) == value) {
+  int i = 0;
+  while (i < len) {
+    int j = i + 1;
+    while (j < len) {
+      if ((arr[i] + arr[j]) == val) {
         cnt++;
       }
+      j++;
     }
+    i++;
   }
   return cnt;
 }
-int countPairs2(int *arr, int len, int value) {
-  int cnt = 0, k = 0, j = 0;
-  for (int i = 0; i < (len - 1); i++) {
-    if ((arr[i] + arr[i + 1]) >= value) {
-      k = i;
-      break;
+
+int countPairs2(int *arr, int len, int val) {
+  int cnt = 0;
+  int end = len - 1;
+  do {
+    end = end - 1;
+  } while (arr[end] > val);
+  int i = 0;
+  while (i < end) {
+    int j = end;
+    while (j > i) {
+      if (arr[j] + arr[i] == val) {
+        cnt++;
+      }
+      j--;
     }
+    i++;
   }
-  for (int i = 0; i < (len - 1); i++) {
-    if (arr[i] > value) {
-      break;
-    }
-    if (k <= i) {
-      j = i + 1;
+  return cnt;
+}
+
+int cbinsearch(int *arr, int size, int val) {
+  int cnt = 0;
+  int left = 0;
+  int right = size - 1;
+  while (left <= right) {
+    int middle = left + (right - left) / 2;
+    if (arr[middle] == val) {
+      cnt++;
+      int i = middle + 1;
+      while (i < size && arr[i] == val) {
+        cnt++;
+        i++;
+      }
+      i = middle - 1;
+      while (i >= 0 && arr[i] == val) {
+        cnt++;
+        i--;
+      }
+      return cnt;
+    } else if (arr[middle] < val) {
+      left = middle + 1;
     } else {
-      j = k;
-    }
-    for (; j < len; j++) {
-      if ((arr[i] + arr[j]) == value) {
-        cnt++;
-      }
-      if (arr[j] > value) {
-        break;
-      }
+      right = middle - 1;
     }
   }
   return cnt;
 }
-int countPairs3(int *arr, int len, int value) {
-  int cnt = 0, k = 0, min = 0, max = 0;
-  for (int i = 0; i < (len - 1); i++) {
-    if (arr[i] > value) {
-      break;
-    }
-    min = i;
-    max = len - 1;
-    while (min < max) {
-      k = min + ((max - min) / 2);
-      if (min == max) {
-        break;
-      }
-      if ((arr[i] + arr[k]) > value) {
-        for (int n = (k - 1); n >= min; n--) {
-          max = n + 1;
-          if (arr[k] != arr[n]) {
-            break;
-          }
-        }
-        if (max - min == 1) {
-          break;
-        }
-      }
-      if ((arr[i] + arr[k]) < value) {
-        for (int n = (k + 1); n <= max; n++) {
-          min = n - 1;
-          if (arr[k] != arr[n]) {
-            break;
-          }
-        }
-        if (max - min == 1) {
-          break;
-        }
-      }
-      if ((arr[i] + arr[k]) == value) {
-        int t = max;
-        for (int n = (k + 1); n <= t; n++) {
-          max = n - 1;
-          if (arr[k] != arr[n]) {
-            break;
-          }
-        }
-        t = min;
-        for (int n = (k - 1); n >= t; n--) {
-          min = n + 1;
-          if (arr[k] != arr[n]) {
-            break;
-          }
-        }
-        break;
-      }
-    }
-    for (int j = min; j <= max; j++) {
-      if (((arr[i] + arr[j]) == value) && (i != j)) {
-        cnt++;
-      }
-    }
+
+int countPairs3(int *arr, int len, int val) {
+  int cnt = 0;
+  int i = 0;
+  while (i < len) {
+    int num = val - arr[i];
+    cnt = cnt + cbinsearch(&arr[i + 1], len - i - 1, num);
+    i++;
   }
   return cnt;
 }
